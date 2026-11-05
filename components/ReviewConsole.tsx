@@ -20,6 +20,14 @@ const dateFormat = new Intl.DateTimeFormat("en-US", {
   timeZoneName: "short",
 });
 
+const dayFormat = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+const timeFormat = new Intl.DateTimeFormat("en-US", {
+  hour: "numeric",
+  minute: "2-digit",
+  timeZone: "UTC",
+  timeZoneName: "short",
+});
+
 function formatDate(iso: string): string {
   return dateFormat.format(new Date(iso));
 }
@@ -99,7 +107,10 @@ export function ReviewConsole({ items }: { items: readonly DisclosureReview[] })
                   <td>
                     <Completeness score={item.upstream.completeness_score} />
                   </td>
-                  <td className="muted nowrap">{formatDate(item.lastUpdated)}</td>
+                  <td className="muted nowrap">
+                    <div>{dayFormat.format(new Date(item.lastUpdated))}</div>
+                    <div>{timeFormat.format(new Date(item.lastUpdated))}</div>
+                  </td>
                 </tr>
               ))}
             </tbody>

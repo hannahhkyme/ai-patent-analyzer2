@@ -155,7 +155,7 @@ tbody tr:focus-visible {
 
 .title {
   font-weight: 550;
-  min-width: 220px;
+  min-width: 200px;
 }
 
 .muted {
