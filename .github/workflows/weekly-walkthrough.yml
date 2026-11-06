@@ -1,0 +1,39 @@
+name: Weekly regression walkthrough
+
+on:
+  schedule:
+    - cron: "17 13 * * 1" # Mondays 13:17 UTC
+  workflow_dispatch:
+
+jobs:
+  walkthrough:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: sudo apt-get update -q && sudo apt-get install -yq ffmpeg
+      - run: npm ci
+      - run: npm run lint && npm run typecheck
+      - run: npx vitest run --reporter=default --reporter=json --outputFile.json=reports/unit.json
+      - run: npm run test:e2e:docker
+        env:
+          CI: "true"
+      - run: npm run record:docker
+        if: always()
+        env:
+          GIT_SHA: ${{ github.sha }}
+      - name: Convert to mp4
+        if: always()
+        run: for f in artifacts/*.webm; do [ -e "$f" ] && ffmpeg -y -loglevel error -i "$f" -c:v libx264 -pix_fmt yuv420p -movflags +faststart "${f%.webm}.mp4"; done; ls -la artifacts || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: weekly-walkthrough-${{ github.run_number }}
+          path: |
+            artifacts/
+            reports/
+            playwright-report/
+          retention-days: 90

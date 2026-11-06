@@ -34,6 +34,24 @@ npm run build      # production build
 npm start          # serve the production build on http://localhost:3000
 ```
 
+## Regression tests
+
+```bash
+npm test                 # Vitest: contract, fixture invariants, ReviewConsole component
+npm run test:e2e:docker  # Playwright E2E + visual baselines (desktop + mobile) in the pinned image
+npm run test:e2e:update  # re-generate screenshot baselines after an intentional UI change
+npm run test:all         # lint + typecheck + unit + e2e
+npm run record:docker    # walkthrough video -> artifacts/walkthrough-<date>.webm
+```
+
+- Screenshot baselines live in `e2e/__screenshots__/` and are rendered in
+  `mcr.microsoft.com/playwright:v1.64.1-noble` (`scripts/pw-docker.sh`) so they
+  match on any machine. Run `test:e2e` without Docker only for debugging.
+- `.github/workflows/ci.yml` runs every check on each PR and push to `main`.
+- `.github/workflows/weekly-walkthrough.yml` runs the suite every Monday and
+  uploads the walkthrough video, screenshots and test reports as an artifact.
+  The video's title card shows the commit and pass counts from `reports/`.
+
 ## Layout
 
 ```
@@ -41,4 +59,7 @@ app/                     layout, page, global styles
 components/ReviewConsole.tsx   queue table + detail panel (client component)
 lib/contracts/           upstream AI Patent Analyzer API contract
 lib/fixtures/            deterministic review-queue fixture data
+tests/unit/              Vitest unit + component tests
+e2e/                     Playwright E2E + visual regression specs and baselines
+scripts/                 pinned Playwright Docker wrapper, walkthrough recorder
 ```
